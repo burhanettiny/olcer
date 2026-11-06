@@ -1,0 +1,10 @@
+{
+  "name": "olcer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ölçer: ölçüm, birim çevirme ve hesaplama uygulaması (PWA)",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/birimler.test.mjs"
+  }
+}
