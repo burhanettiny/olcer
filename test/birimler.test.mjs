@@ -165,3 +165,46 @@ test('nabız (PPG) sinyali', async () => {
     assert.ok(r && Math.abs(r.bpm - bpm) / bpm < 0.03, `${bpm} → ${r?.bpm}`);
   }
 });
+
+test('WMM2025 (NOAA resmî test değerleri)', async () => {
+  const { manyetikAlan } = await import('../js/wmm.js');
+  // yıl, yükseklik km, enlem, boylam, X, Y, Z (nT), sapma (°)
+  const resmi = [
+    [2025.0, 28, 89, -121, -255.388723, -1482.460628, 56194.288771, -99.77],
+    [2025.0, 65, 43, 93, 24299.852822, 210.517066, 50037.923998, 0.50],
+    [2025.0, 3, -50, -103, 19526.532799, 10362.990980, -31437.562789, 27.96],
+    [2025.0, 18, 0, 21, 29274.811882, 659.800118, -14316.722540, 1.29],
+    [2025.5, 8, -52, -75, 19331.857134, 5147.774727, -23532.664273, 14.91],
+  ];
+  for (const [yil, h, la, lo, X, Y, Z, D] of resmi) {
+    const r = manyetikAlan(la, lo, h, yil);
+    assert.ok(Math.abs(r.X - X) < 0.5 && Math.abs(r.Y - Y) < 0.5 && Math.abs(r.Z - Z) < 0.5, `${la},${lo}: ${r.X} ${r.Y} ${r.Z}`);
+    assert.ok(Math.abs(r.D - D) < 0.01);
+  }
+});
+
+test('kıble yönü', async () => {
+  const { kibleYonu } = await import('../js/kible.js');
+  yakin(kibleYonu(41.0082, 28.9784).azimut, 151.62, 2e-4);  // İstanbul
+  yakin(kibleYonu(40.7128, -74.006).azimut, 58.48, 2e-4);   // New York
+  assert.ok(kibleYonu(21.4225, 39.8262).uzaklik < 10);
+});
+
+test('güneş konumu', () => {
+  // Ankara, 21 Aralık öğle: yükseklik ≈ 90 − 39,93 − 23,44 = 26,6°
+  let enYuksek = -90;
+  for (let dk = 0; dk < 1440; dk++) enYuksek = Math.max(enYuksek, F.gunesKonumu(new Date(Date.UTC(2026, 11, 21, 0, dk)), 39.93, 32.86).yukseklik);
+  assert.ok(Math.abs(enYuksek - 26.63) < 0.3, String(enYuksek));
+});
+
+test('kenar terazisi', async () => {
+  const { kenarSapmasi } = await import('../js/terazi.js');
+  const g = 9.81, a = 2 * Math.PI / 180;
+  // Dik (portre), saat yönünde 2° döndürülmüş: sapma −2°
+  yakin(kenarSapmasi(-g * Math.sin(a), g * Math.cos(a)).sapma, -2, 1e-9);
+  // Yatay (manzara) ve 2° saat yönünde: yine −2°, referans 90°
+  const k = kenarSapmasi(g * Math.cos(a), g * Math.sin(a));
+  yakin(k.sapma, -2, 1e-9); assert.equal(k.ref, 90);
+  // iOS gibi işaretler tersse sapma değişmez
+  yakin(kenarSapmasi(g * Math.sin(a), -g * Math.cos(a)).sapma, -2, 1e-9);
+});

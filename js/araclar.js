@@ -11,6 +11,8 @@ import { CANLI } from './canli.js';
 import { MESAFE_YUKSEKLIK, NABIZ, RENK } from './kamera.js';
 import { FREKANS } from './frekans.js';
 import { EKSPERTIZ } from './ekspertiz.js';
+import { KIBLE } from './kible.js';
+import { TERAZI } from './terazi.js';
 
 export { ayarOku, ayarYaz };
 
@@ -28,6 +30,8 @@ async function yonIzni() {
 export const ARACLAR = [
   CANLI,
   HIZ_OLCER,
+  KIBLE,
+  TERAZI,
   MESAFE_YUKSEKLIK,
   NABIZ,
   FREKANS,
@@ -116,47 +120,6 @@ export const ARACLAR = [
       addEventListener('resize', yeniden);
       requestAnimationFrame(ciz);
       return () => removeEventListener('resize', yeniden);
-    },
-  },
-
-  // ------------------------------------------------------------ SU TERAZİSİ
-  {
-    id: 'terazi', ad: 'Su terazisi / eğim ölçer', ikon: '🫧', aciklama: 'Telefonu bir yüzeye koyarak yataylığı ve eğimi ölçün.',
-    ac(kok) {
-      let ofset = ayarOku('teraziOfset', { b: 0, g: 0 });
-      let son = null;
-      const kabarcik = el('div', { sinif: 'kabarcik' });
-      const kadran = el('div', { sinif: 'kadran' }, el('div', { sinif: 'kadran-merkez' }), kabarcik);
-      const dx = deger(), dy = deger(), toplam = deger();
-      const bilgi = el('p', { sinif: 'kucuk' }, 'Başlatmak için düğmeye basın.');
-      const dinle = e => {
-        if (e.beta == null) return;
-        son = { b: e.beta, g: e.gamma };
-        const b = e.beta - ofset.b, g = e.gamma - ofset.g;
-        const egim = Math.atan(Math.sqrt(Math.tan(b * Math.PI / 180) ** 2 + Math.tan(g * Math.PI / 180) ** 2)) * 180 / Math.PI;
-        dx.textContent = `${bicimle(g, 3)}°  (%${bicimle(Math.tan(g * Math.PI / 180) * 100, 3)})`;
-        dy.textContent = `${bicimle(b, 3)}°  (%${bicimle(Math.tan(b * Math.PI / 180) * 100, 3)})`;
-        toplam.textContent = `${bicimle(egim, 3)}°`;
-        const sinir = 20, R = kadran.clientWidth / 2 - 22;
-        kabarcik.style.transform = `translate(${Math.max(-1, Math.min(1, -g / sinir)) * R}px, ${Math.max(-1, Math.min(1, -b / sinir)) * R}px)`;
-        kabarcik.classList.toggle('duz', egim < 0.3);
-        bilgi.textContent = '';
-      };
-      const baslat = async () => {
-        try { await yonIzni(); addEventListener('deviceorientation', dinle); bilgi.textContent = 'Sensör bekleniyor…'; setTimeout(() => { if (!son) bilgi.textContent = 'Sensör verisi gelmiyor: bu cihazda/tarayıcıda hareket sensörü yok olabilir.'; }, 2000); }
-        catch (e) { bilgi.textContent = e.message; }
-      };
-      kok.append(
-        kadran,
-        satir('Sol–sağ (x)', dx), satir('Ön–arka (y)', dy), satir('Toplam eğim', toplam), bilgi,
-        el('div', { sinif: 'dugmeler' },
-          el('button', { sinif: 'birincil', onclick: baslat }, 'Başlat'),
-          el('button', { onclick: () => { if (son) { ofset = { ...son }; ayarYaz('teraziOfset', ofset); } } }, 'Sıfırla (kalibre et)'),
-          el('button', { onclick: () => { ofset = { b: 0, g: 0 }; ayarYaz('teraziOfset', ofset); } }, 'Kalibrasyonu sil'),
-        ),
-        uyari('Kalibrasyon: telefonu düz bir yüzeye koyup "Sıfırla"ya basın, sonra 180° döndürüp okumayı kontrol edin. İki okuma eşit değilse yüzey eğiktir; ortalamaları alın. Telefon sensörleri tipik olarak ±0,1–0,5° hassastır.'),
-      );
-      return () => removeEventListener('deviceorientation', dinle);
     },
   },
 

@@ -322,3 +322,44 @@ body.odakta { overflow: hidden; }
 .tanilama { white-space: pre-wrap; font-size: .78rem; background: var(--yuzey2); padding: .75rem; border-radius: 10px; overflow-wrap: anywhere; }
 .nabiz-ilerleme { height: 6px; border-radius: 3px; background: var(--yuzey2); overflow: hidden; margin: .25rem 0 .5rem; }
 .nabiz-ilerleme > div { height: 100%; width: 0; background: #ef4444; transition: width .4s; }
+
+/* ---- terazi ---- */
+.terazi-gosterge { border-radius: 18px; transition: box-shadow .2s; }
+.terazi-gosterge.duz { box-shadow: 0 0 0 3px #22c55e; }
+.terazi-gosterge [hidden] { display: none !important; }
+.terazi-aci { font-size: 3rem; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; margin-top: .5rem; }
+.terazi-yonerge { text-align: center; font-weight: 700; font-size: 1.1rem; }
+.terazi-ek { text-align: center; }
+.kenar-ekran { aspect-ratio: 1; max-width: 360px; margin: 0 auto; display: grid; place-items: center; background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: 18px; overflow: hidden; }
+.kenar-ic { width: 86%; display: grid; gap: 1rem; justify-items: center; transition: transform .25s; }
+.kenar-aci { font-size: 2.4rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.kenar-yon { font-weight: 700; }
+.ufuk { width: 100%; height: 3px; background: #ef4444; border-radius: 2px; transition: transform .05s linear; }
+.tup { position: relative; width: 100%; height: 46px; border-radius: 23px; background: linear-gradient(#d9f99d, #a3e635); border: 2px solid #65a30d; box-shadow: inset 0 3px 6px #0002; }
+.tup-cizgi { position: absolute; top: 4px; bottom: 4px; width: 2px; background: #365314; }
+.tup-cizgi.sol { left: calc(50% - 26px); } .tup-cizgi.sag { left: calc(50% + 24px); }
+.tup-kabarcik { position: absolute; left: 50%; top: 50%; width: 44px; height: 30px; margin: -15px -22px; border-radius: 15px; background: radial-gradient(circle at 35% 35%, #fff, #fefce8 60%, #ecfccb); border: 1px solid #84cc16; transition: transform .05s linear; }
+.tup-kabarcik.duz { box-shadow: 0 0 0 3px #22c55e; }
+.terazi-kamera { aspect-ratio: 3 / 4; }
+.kamera-ufuk { position: absolute; inset: 0; pointer-events: none; transition: transform .05s linear; }
+.kamera-ufuk .yatay { position: absolute; left: -50%; right: -50%; top: 50%; height: 2px; background: #ef4444; box-shadow: 0 0 0 1px #0007; }
+.kamera-ufuk .dikey { position: absolute; top: -50%; bottom: -50%; left: 50%; width: 2px; background: #ef444488; }
+.kamera-ufuk.duz .yatay, .kamera-ufuk.duz .dikey { background: #22c55e; }
+
+/* ---- kıble ---- */
+.kible-kadran { position: relative; width: min(300px, 82vw); aspect-ratio: 1; margin: 1rem auto .5rem; border-radius: 50%; background: var(--yuzey); border: 3px solid var(--cizgi); box-shadow: var(--golge); transition: border-color .2s; }
+.kible-kadran.hizali { border-color: #22c55e; box-shadow: 0 0 0 4px #22c55e55; }
+.kible-gul { position: absolute; inset: 0; transition: transform .2s ease-out; font-weight: 700; }
+.kible-gul > span { position: absolute; left: 50%; top: 50%; width: 2rem; margin: -.75rem -1rem; text-align: center; }
+.kible-gul .kuzey { transform: translateY(calc(min(150px, 41vw) * -0.8)); color: #dc2626; font-size: 1.2rem; }
+.kible-gul .guney { transform: translateY(calc(min(150px, 41vw) * 0.8)); }
+.kible-gul .dogu { transform: translateX(calc(min(150px, 41vw) * 0.8)); }
+.kible-gul .bati { transform: translateX(calc(min(150px, 41vw) * -0.8)); }
+.kible-kabe { position: absolute; left: 50%; top: 50%; width: 2.2rem; height: 2.2rem; margin: -1.1rem; font-size: 1.8rem; line-height: 2.2rem; text-align: center; }
+.kible-ok { position: absolute; left: 50%; top: 12%; bottom: 50%; width: 0; transform-origin: 50% 100%; transition: transform .2s ease-out; }
+.kible-ok::before { content: ''; position: absolute; left: -7px; top: 14px; bottom: 0; width: 14px; background: linear-gradient(#0f766e, #14b8a6); border-radius: 7px 7px 2px 2px; }
+.kible-ok::after { content: ''; position: absolute; left: -16px; top: -6px; border: 16px solid transparent; border-bottom: 24px solid #0f766e; border-top: 0; }
+.kible-kadran.hizali .kible-ok::before { background: linear-gradient(#15803d, #22c55e); }
+.kible-kadran.hizali .kible-ok::after { border-bottom-color: #15803d; }
+.kible-merkez { position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px; border-radius: 50%; background: var(--yazi); }
+.kible-yonerge { text-align: center; font-size: 1.35rem; font-weight: 800; margin-bottom: .75rem; }

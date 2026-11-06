@@ -213,3 +213,25 @@ export function sayilariAyikla(metin) {
     return /^[-+−]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s) ? Number(s.replace('−', '-')) : NaN;
   });
 }
+
+// ---------------------------------------------------------------- güneş
+/**
+ * Güneşin görünür konumu (NOAA/Astronomical Almanac düşük duyarlıklı formülü, ±0,5° içinde).
+ * Dönüş: azimut (kuzeyden saat yönünde, derece) ve yükseklik açısı (derece).
+ */
+export function gunesKonumu(tarih, enlem, boylam) {
+  const r = Math.PI / 180;
+  const n = tarih.getTime() / 86400000 + 2440587.5 - 2451545.0;
+  const L = (280.46 + 0.9856474 * n) % 360;
+  const g = ((357.528 + 0.9856003 * n) % 360) * r;
+  const lambda = (L + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)) * r;
+  const eps = (23.439 - 0.0000004 * n) * r;
+  const ra = Math.atan2(Math.cos(eps) * Math.sin(lambda), Math.cos(lambda));
+  const dek = Math.asin(Math.sin(eps) * Math.sin(lambda));
+  const gmst = ((18.697374558 + 24.06570982441908 * n) % 24 + 24) % 24;
+  const H = (gmst * 15 + boylam) * r - ra;
+  const fi = enlem * r;
+  const yukseklik = Math.asin(Math.sin(fi) * Math.sin(dek) + Math.cos(fi) * Math.cos(dek) * Math.cos(H));
+  const azimut = Math.atan2(-Math.sin(H), Math.tan(dek) * Math.cos(fi) - Math.sin(fi) * Math.cos(H));
+  return { azimut: ((azimut / r) % 360 + 360) % 360, yukseklik: yukseklik / r };
+}
