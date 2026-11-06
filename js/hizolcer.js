@@ -3,6 +3,7 @@
 import { bicimle, sayiOku, sureBicimle } from './birimler.js';
 import { haversine, kerteriz, G0 } from './fizik.js';
 import { el, ayarOku, ayarYaz, kayitDugmesi } from './ortak.js';
+import { KeepAwake } from './yerel.js';
 
 const BIRIMLER = [['km/sa', 3.6], ['m/s', 1], ['mph', 1 / 0.44704], ['kn', 3600 / 1852]];
 const DURMA_ESIGI = 0.5;   // m/s — bunun altı GPS gürültüsü kabul edilip 0 gösterilir
@@ -131,7 +132,7 @@ export const HIZ_OLCER = {
 
     async function ekraniAcikTut() {
       try {
-        const k = window.Capacitor?.Plugins?.KeepAwake;
+        const k = KeepAwake;
         if (k) { await k.keepAwake(); kilit = { release: () => k.allowSleep() }; return; }
         if ('wakeLock' in navigator) kilit = await navigator.wakeLock.request('screen');
       } catch { /* desteklenmiyor */ }

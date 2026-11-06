@@ -149,3 +149,19 @@ test('renk dönüşümleri', async () => {
   yakin(kirmizi[0], 53.24, 1e-3); yakin(kirmizi[1], 80.09, 1e-3);
   assert.equal(enYakinRenk(20, 30, 95).ad, 'Lacivert');
 });
+
+test('nabız (PPG) sinyali', async () => {
+  const { nabizHesapla } = await import('../js/kamera.js');
+  for (const bpm of [48, 62, 75, 96, 130, 170]) {
+    const fs = 30, n = fs * 10, y = new Float64Array(n);
+    let tohum = 7;
+    const rastgele = () => ((tohum = (tohum * 16807) % 2147483647) / 2147483647 - 0.5);
+    for (let i = 0; i < n; i++) {
+      const t = i / fs, f = bpm / 60;
+      // ana dalga + dikrotik çentik (2. harmonik) + solunum kayması + gürültü
+      y[i] = 200 + 1.2 * Math.sin(2 * Math.PI * f * t) + 0.5 * Math.sin(4 * Math.PI * f * t + 1) + 3 * Math.sin(2 * Math.PI * 0.25 * t) + 0.4 * rastgele();
+    }
+    const r = nabizHesapla(y, fs);
+    assert.ok(r && Math.abs(r.bpm - bpm) / bpm < 0.03, `${bpm} → ${r?.bpm}`);
+  }
+});

@@ -319,3 +319,6 @@ body.odakta { overflow: hidden; }
 .kayit dd { margin: 0; font-weight: 600; text-align: right; overflow-wrap: anywhere; }
 .kayit hr { border: 0; border-top: 1px dashed var(--cizgi); margin: .25rem 0; width: 100%; }
 .kayit .dugmeler { margin: .5rem 0 0; }
+.tanilama { white-space: pre-wrap; font-size: .78rem; background: var(--yuzey2); padding: .75rem; border-radius: 10px; overflow-wrap: anywhere; }
+.nabiz-ilerleme { height: 6px; border-radius: 3px; background: var(--yuzey2); overflow: hidden; margin: .25rem 0 .5rem; }
+.nabiz-ilerleme > div { height: 100%; width: 0; background: #ef4444; transition: width .4s; }

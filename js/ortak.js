@@ -51,7 +51,7 @@ export const kayitDugmesi = (topla, baslik) => el('button', { type: 'button', on
 /** Metni paylaşır; paylaşım yoksa panoya kopyalar. */
 export async function paylas(baslik, metin) {
   try {
-    const S = window.Capacitor?.Plugins?.Share;
+    const S = (await import('./yerel.js')).Share;
     if (S) { await S.share({ title: baslik, text: metin, dialogTitle: baslik }); return; }
     if (navigator.share) { await navigator.share({ title: baslik, text: metin }); return; }
   } catch (e) { if (e?.name === 'AbortError') return; }

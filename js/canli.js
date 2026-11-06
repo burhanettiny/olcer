@@ -4,9 +4,11 @@
 
 import { bicimle, sayiOku } from './birimler.js';
 import { G0, barometrikYukseklik, ciyNoktasi, haversine } from './fizik.js';
-import { el, ayarOku, ayarYaz, kayitDugmesi } from './ortak.js';
+import { el, ayarOku, ayarYaz, kayitDugmesi, paylas } from './ortak.js';
 
-const yerel = () => window.Capacitor?.Plugins?.OlcerSensor;
+import { OlcerSensor, KeepAwake } from './yerel.js';
+
+const yerel = () => OlcerSensor;
 const GECMIS = 150;
 
 function kart(ikon, ad, birim) {
@@ -81,7 +83,7 @@ export const CANLI = {
   id: 'canli', ad: 'Canlı ölçüm paneli', ikon: '📡', one: true,
   aciklama: 'İstediğiniz büyüklükleri seçin: hız, basınç, rakım, ışık, manyetik alan, ivme, titreşim, dönüş, eğim, adım, ses, pil… anlık.',
   ac(kok) {
-    const temizlik = [];
+    const temizlik = [], temizlikSabit = [];
     const k = {
       gps: kart('🛰️', 'Hız ve konum (GPS)', 'km/sa'),
       basinc: kart('⏲️', 'Hava basıncı ve rakım', 'hPa'),
@@ -123,6 +125,7 @@ export const CANLI = {
       if (!navigator.geolocation) return k.gps.yok('Konum desteklenmiyor.');
       if (!secili('gps')) return;
       gpsId = navigator.geolocation.watchPosition(p => {
+        say('GPS konumu');
         const c = p.coords;
         let v = c.speed;
         if (gpsSon && (v == null || v < 0)) { const dt = (p.timestamp - gpsSon.t) / 1000; v = dt > 0 ? haversine(gpsSon.lat, gpsSon.lon, c.latitude, c.longitude) / dt : 0; }
@@ -145,6 +148,7 @@ export const CANLI = {
     const titresim = [];
     let gMaks = 0, tepeIvme = 0, sonFrekans = NaN, frekansZamani = 0;
     function hareket(e) {
+      say('Hareket (ivme/jiroskop)');
       const a = e.acceleration, ag = e.accelerationIncludingGravity, r = e.rotationRate;
       const simdi = performance.now();
       if (ag && ag.x != null) {
@@ -174,6 +178,7 @@ export const CANLI = {
     let baslik = null;
     function mutlakYon(e) { if (e.absolute && e.alpha != null) baslik = (360 - e.alpha) % 360; }
     function yon(e) {
+      say('Yön (eğim)');
       if (e.beta == null) return;
       if (typeof e.webkitCompassHeading === 'number') baslik = e.webkitCompassHeading;
       else if (e.absolute && e.alpha != null) baslik = (360 - e.alpha) % 360;
@@ -230,9 +235,10 @@ export const CANLI = {
         }
         return;
       }
-      const tutucu = await P.addListener('veri', e => isleyici[e.tur]?.(e.degerler.map(Number)));
+      const tutucu = await P.addListener('veri', e => { say('Yerel: ' + e.tur); isleyici[e.tur]?.(e.degerler.map(Number)); });
       temizlik.push(() => { tutucu.remove(); P.hepsiniDurdur(); });
       const { sensorler } = await P.liste();
+      sensorListesi = sensorler;
       const yok = new Set(sensorler.filter(s => !s.var).map(s => s.tur));
       if (yok.has('sicaklik') && yok.has('nem')) k.sicaklik.yok('Bu telefonda ortam sıcaklığı/nem sensörü yok (çoğu telefonda bulunmaz). Pil sıcaklığı aşağıda.');
       const kartAdi = t => (t === 'nem' ? 'sicaklik' : t);
@@ -334,7 +340,7 @@ export const CANLI = {
       temizlik.push(() => clearInterval(pilSaat));
       await yerelBaslat();
       try {
-        const KA = window.Capacitor?.Plugins?.KeepAwake;
+        const KA = KeepAwake;
         if (KA) { await KA.keepAwake(); temizlik.push(() => KA.allowSleep()); }
         else if ('wakeLock' in navigator) { const w = await navigator.wakeLock.request('screen'); temizlik.push(() => w.release()); }
       } catch { /* yok */ }
@@ -357,6 +363,32 @@ export const CANLI = {
     qnhGir.addEventListener('change', () => { const x = sayiOku(qnhGir.value); if (x > 800 && x < 1100) { qnh = x; ayarYaz('qnh', x); if (Number.isFinite(sonBasinc)) isleyici.basinc([sonBasinc]); } });
     k.ses.bilgi('Mikrofon izni için "Ses ölçümünü aç"a basın.');
 
+    // -------------------------------------------------------- tanılama
+    const sayaclar = {};
+    let sensorListesi = null;
+    function say(ad) { sayaclar[ad] = (sayaclar[ad] || 0) + 1; }
+    const tanilamaKutu = el('pre', { sinif: 'tanilama', hidden: true });
+    async function tanilamaYaz() {
+      const satir = [];
+      satir.push(`Ortam: ${OlcerSensor ? 'Android uygulaması (yerel eklenti bağlı)' : window.Capacitor?.isNativePlatform?.() ? 'Android uygulaması — YEREL EKLENTİ BAĞLI DEĞİL' : 'Tarayıcı'}`);
+      satir.push(`Ölçüm: ${calisiyor ? 'sürüyor' : 'başlatılmadı'}`);
+      for (const ad of ['geolocation', 'camera', 'microphone', 'accelerometer', 'gyroscope', 'magnetometer']) {
+        try { const d = await navigator.permissions.query({ name: ad }); satir.push(`İzin ${ad}: ${d.state}`); } catch { /* sorgulanamıyor */ }
+      }
+      if (sensorListesi) {
+        satir.push('', 'Telefondaki sensörler:');
+        for (const x of sensorListesi) satir.push(`  ${x.tur}: ${x.var ? `var (${x.ad})` : 'yok'}`);
+      }
+      satir.push('', 'Gelen veri sayısı:');
+      const adlar = Object.keys(sayaclar);
+      if (!adlar.length) satir.push('  henüz veri yok');
+      for (const ad of adlar) satir.push(`  ${ad}: ${sayaclar[ad]}`);
+      satir.push('', `Tarayıcı: ${navigator.userAgent}`);
+      tanilamaKutu.textContent = satir.join('\n');
+    }
+    const tanilamaSaat = setInterval(() => { if (!tanilamaKutu.hidden) tanilamaYaz(); }, 1000);
+    temizlikSabit.push(() => clearInterval(tanilamaSaat));
+
     kok.append(
       el('p', { sinif: 'kucuk' }, 'Görmek istediğiniz ölçümleri seçin. Bir karta dokunursanız tam ekran büyür.'),
       cipler,
@@ -368,10 +400,14 @@ export const CANLI = {
       el('label', { sinif: 'girdi' }, el('span', {}, 'Bugünkü deniz seviyesi basıncı QNH (hPa) — barometrik rakım için'), qnhGir),
       el('p', { sinif: 'kucuk' }, 'QNH değerini en yakın havalimanının METAR raporundan ya da meteorolojiden alın. "Göreli yükseklik farkı" ise QNH gerektirmez: Sıfırla\'ya bastığınız yere göre kaç metre çıktığınızı/indiğinizi gösterir (kat farkını bile ayırt eder).'),
       el('p', { sinif: 'uyari' }, 'Telefon sensörleri kalibre ölçüm cihazı değildir; değerler bilgilendirme amaçlıdır. Hangi sensörlerin bulunduğu telefona göre değişir.'),
+      el('div', { sinif: 'dugmeler' },
+        el('button', { type: 'button', onclick: () => { tanilamaKutu.hidden = !tanilamaKutu.hidden; tanilamaYaz(); } }, '🔧 Tanılama'),
+        el('button', { type: 'button', onclick: () => { tanilamaYaz().then(() => paylas('Ölçer tanılama', tanilamaKutu.textContent)); } }, '📤 Tanılamayı paylaş')),
+      tanilamaKutu,
     );
     secimUygula();
     if (!yerel()) bilgi.textContent = 'Tarayıcıda çalışıyorsunuz: basınç, adım, yakınlık gibi sensörler yalnızca Android uygulamasında görünür.';
-    return () => { clearInterval(cizSaat); hepsiniDurdur(); document.body.classList.remove('odakta'); };
+    return () => { clearInterval(cizSaat); temizlikSabit.forEach(f => f()); hepsiniDurdur(); document.body.classList.remove('odakta'); };
   },
 };
 
