@@ -50,7 +50,7 @@ function anaSayfa() {
   const cevirici = el('section', {}, el('h2', {}, 'Birim çevirici'),
     el('div', { sinif: 'izgara kucuk-izgara' }, Object.entries(BOYUTLAR).filter(([, b]) => !b.gizli).map(([id, b]) => kart(`#/cevir/${id}`, b.ikon, b.ad))));
   const araclar = el('section', {}, el('h2', {}, 'Cihazla ölç'),
-    el('div', { sinif: 'izgara' }, ARACLAR.map(a => kart(`#/arac/${a.id}`, a.ikon, a.ad, a.aciklama))));
+    el('div', { sinif: 'izgara' }, ARACLAR.map(a => { const k = kart(`#/arac/${a.id}`, a.ikon, a.ad, a.aciklama); if (a.one) k.classList.add('one-cikan'); return k; })));
   const hesaplar = el('section', {}, el('h2', {}, 'Hesaplayıcılar'),
     KATEGORILER.map(k => el('div', { sinif: 'kategori' },
       el('h3', {}, `${k.ikon} ${k.ad}`),

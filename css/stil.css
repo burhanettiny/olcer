@@ -178,3 +178,63 @@ button.birincil { background: var(--vurgu); color: var(--zemin); border-color: v
   .kucuk-izgara { grid-template-columns: 1fr 1fr; }
   .birimli > select { max-width: 7.5rem; }
 }
+
+/* ---- öne çıkan araçlar ---- */
+.kart.one-cikan { background: var(--vurgu-acik); border-color: var(--vurgu); }
+.kart.one-cikan strong { font-size: 1.05rem; }
+
+/* ---- canlı ölçüm paneli ---- */
+.canli-izgara { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: .6rem; margin: .5rem 0 1rem; }
+.canli-kart { background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: 14px; padding: .7rem .85rem; box-shadow: var(--golge); min-width: 0; }
+.canli-kart header { font-weight: 600; font-size: .9rem; color: var(--soluk); }
+.canli-ana { margin: .1rem 0 .2rem; }
+.canli-deger { font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.canli-birim { color: var(--soluk); font-weight: 600; }
+.canli-detay { display: grid; gap: .1rem; font-size: .85rem; }
+.canli-detay div { display: flex; justify-content: space-between; gap: .75rem; }
+.canli-detay span { color: var(--soluk); }
+.canli-detay strong { font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+.canli-grafik { width: 100%; height: 48px; display: block; margin-top: .35rem; }
+.canli-durum { font-size: .8rem; color: var(--soluk); }
+.canli-durum:empty { display: none; }
+.canli-kart.yok { opacity: .55; }
+.canli-kart.yok .canli-grafik, .canli-kart.bos .canli-grafik { display: none; }
+
+/* ---- hız göstergesi ---- */
+.hiz-ekran { background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: 18px; padding: 1rem; text-align: center; box-shadow: var(--golge); }
+.hiz-sayi { font-size: clamp(5rem, 30vw, 10rem); line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
+.hiz-birim { font-size: 1.2rem; font-weight: 700; color: var(--vurgu); background: none; border: 0; }
+.hiz-durum { font-size: .85rem; color: var(--soluk); margin-bottom: .6rem; }
+.hiz-durum.zayif { color: var(--uyari); }
+.hiz-izgara { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; text-align: left; }
+.hiz-kutu { background: var(--yuzey2); border-radius: 10px; padding: .4rem .55rem; min-width: 0; }
+.hiz-kutu span { display: block; font-size: .72rem; color: var(--soluk); }
+.hiz-kutu strong { font-size: .95rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.hiz-yaris { font-weight: 700; margin-top: .6rem; color: var(--vurgu); }
+.hiz-yaris:empty { display: none; }
+.hiz-ekran.asim { border-color: #dc2626; box-shadow: 0 0 0 3px #dc262655; }
+.hiz-ekran.asim .hiz-sayi { color: #dc2626; }
+.hiz-ekran.hud { background: #000; color: #4ade80; transform: scaleY(-1); border-color: #000; }
+.hiz-ekran.hud .hiz-kutu { background: #111; }
+.hiz-ekran.hud .hiz-kutu span, .hiz-ekran.hud .hiz-durum { color: #86efac; }
+@media (max-width: 380px) { .hiz-izgara { grid-template-columns: repeat(2, 1fr); } }
+
+/* ---- canlı panel: seçim ve büyütme ---- */
+.cipler { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0; }
+.cip { border-radius: 999px; padding: .4rem .75rem; font-size: .85rem; background: var(--yuzey); color: var(--soluk); }
+.cip[aria-pressed="true"] { background: var(--vurgu); border-color: var(--vurgu); color: var(--zemin); font-weight: 600; }
+.canli-kart { cursor: zoom-in; position: relative; }
+.canli-kart[hidden] { display: none; }
+.canli-kapat { display: none; position: absolute; top: 12px; right: 12px; padding: .3rem .7rem; font-size: 1.1rem; }
+.canli-kart.odak {
+  position: fixed; inset: 0; z-index: 30; border-radius: 0; cursor: default; overflow-y: auto;
+  display: flex; flex-direction: column; justify-content: center; padding: max(24px, env(safe-area-inset-top)) 24px 24px;
+}
+.canli-kart.odak .canli-kapat { display: block; }
+.canli-kart.odak header { font-size: 1.2rem; }
+.canli-kart.odak .canli-ana { text-align: center; margin: 1rem 0; }
+.canli-kart.odak .canli-deger { font-size: clamp(4rem, 22vw, 9rem); line-height: 1; }
+.canli-kart.odak .canli-birim { font-size: 1.6rem; display: block; }
+.canli-kart.odak .canli-detay { font-size: 1.05rem; gap: .35rem; max-width: 520px; width: 100%; margin: 0 auto; }
+.canli-kart.odak .canli-grafik { height: 160px; max-width: 720px; margin: 1.25rem auto 0; }
+body.odakta { overflow: hidden; }

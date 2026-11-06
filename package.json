@@ -2,9 +2,19 @@
   "name": "olcer",
   "version": "1.0.0",
   "private": true,
-  "description": "Ölçer: ölçüm, birim çevirme ve hesaplama uygulaması (PWA)",
+  "description": "Ölçer: ölçüm, birim çevirme, hesaplama ve canlı sensör uygulaması (Android + PWA)",
   "type": "module",
   "scripts": {
-    "test": "node --test test/birimler.test.mjs"
+    "test": "node --test test/birimler.test.mjs",
+    "www": "node scripts/www.mjs",
+    "android": "node scripts/www.mjs && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor-community/keep-awake": "8.0.1",
+    "@capacitor/android": "8.6.0",
+    "@capacitor/core": "8.6.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0"
   }
 }

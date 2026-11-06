@@ -1,10 +1,28 @@
 # Ölçer
 
-Ölçümle ilgili her ihtiyaç için tek uygulama: birim çevirici, geometrik ve fiziksel hesaplayıcılar ve telefonun sensörleriyle doğrudan ölçüm. Türkçe arayüzlüdür, internet gerektirmez (PWA, çevrimdışı çalışır), hiçbir veri göndermez.
+Ölçümle ilgili her ihtiyaç için telefon uygulaması: telefonun sensörleriyle anlık ölçüm, birim çevirici ve geometrik/fiziksel hesaplayıcılar. Türkçedir, internet gerektirmez, hiçbir veri göndermez.
+
+## Telefona kurulum (Android)
+
+**[⬇ Son sürümü indir (olcer.apk)](https://github.com/burhanettiny/olcer/releases/latest/download/olcer.apk)**
+
+1. Bu bağlantıyı telefonda açın; `olcer.apk` iner.
+2. İndirilen dosyaya dokunun. Telefon "bilinmeyen uygulamaları yükle" izni isterse tarayıcınıza izin verin.
+3. **Yükle**'ye basın. Yeni sürümler aynı şekilde eskisinin üzerine kurulur, kayıtlarınız korunur.
+
+APK, `main` dalına yapılan her değişiklikte GitHub Actions ile otomatik derlenir ve [Sürümler](https://github.com/burhanettiny/olcer/releases) sayfasında yayınlanır.
+
+iPhone için: uygulama tarayıcıda da çalışır (GitHub Pages açıksa `https://burhanettiny.github.io/olcer/`, Safari → Paylaş → Ana Ekrana Ekle). Ancak iOS; basınç, ışık, manyetik alan gibi sensörleri tarayıcıya açmadığı için bunlar yalnızca Android uygulamasında görünür.
 
 ## Neler var
 
 **Cihazla ölç (sensörler)**
+- **Canlı ölçüm paneli:** istediğiniz büyüklükleri seçin, anlık değer + grafik; karta dokununca tam ekran:
+  hız ve konum, hava basıncı, barometrik rakım ve göreli yükseklik farkı, ışık (lüks), manyetik alan (µT),
+  ivme, G kuvveti, titreşim (RMS, tepe, baskın frekans), dönüş hızı, eğim, yön, adım, ses (dB), yakınlık,
+  ortam sıcaklığı/nem (sensörü olan telefonlarda), pil yüzdesi, gerilimi, sıcaklığı ve akımı
+- **Hız göstergesi:** büyük rakamlı anlık hız, en yüksek/ortalama hız, yol, süre, rakım, yön, ivme, G kuvveti,
+  hız sınırı uyarısı (titreşim + ses), 0–100 km/sa ölçümü, cama yansıtma (HUD) modu, ekran açık kalır
 - Ekran cetveli: kredi/kimlik kartıyla (ISO/IEC 7810 ID-1, 85,60 mm) kalibre edilir
 - Su terazisi / eğim ölçer: sıfır kalibrasyonlu
 - Pusula: manyetik sapma girilerek gerçek kuzey
@@ -56,6 +74,22 @@ Ardından `http://localhost:8000` adresini açın. Sensörler (konum, hareket, m
 
 **GitHub Pages ile yayın:** Settings → Pages → Build and deployment → kaynak olarak `main` dalı ve `/ (root)`. Site `https://<kullanıcı-adı>.github.io/olcer/` adresinde açılır; telefonda "Ana ekrana ekle" ile uygulama gibi kurulur.
 
+## Android uygulamasını yerelde derleme
+
+Node 22, JDK 21 ve Android SDK gerekir:
+
+```bash
+npm ci
+```
+
+```bash
+npm run android
+```
+
+```bash
+cd android && ./gradlew assembleDebug
+```
+
 ## Testler
 
 ```bash
@@ -69,7 +103,10 @@ npm test
 | `js/birimler.js` | birim tanımları, çeviri, Türkçe sayı okuma/biçimleme |
 | `js/fizik.js` | ISA, barometrik formül, jeodezi, yerçekimi, nem, istatistik |
 | `js/hesaplar.js` | hesaplayıcı tanımları (girdi/çıktı bildirimsel) |
-| `js/araclar.js` | sensör araçları |
+| `js/araclar.js` | sensör araçları (cetvel, terazi, pusula, GPS, ses, kronometre) |
+| `js/canli.js` | canlı ölçüm paneli |
+| `js/hizolcer.js` | hız göstergesi |
+| `android/` | Capacitor Android projesi; `OlcerSensorPlugin.java` tarayıcının erişemediği sensörleri okur |
 | `js/app.js` | arayüz ve yönlendirme |
 | `sw.js` | çevrimdışı önbellek (dosyalar değişince `SURUM`'ü artırın) |
 

@@ -1,6 +1,6 @@
 // Ölçer — çevrimdışı çalışma için önbellek. Dosya değişince SURUM'ü artırın.
-const SURUM = 'olcer-v1';
-const DOSYALAR = ['./', 'index.html', 'css/stil.css', 'js/app.js', 'js/birimler.js', 'js/fizik.js', 'js/hesaplar.js', 'js/araclar.js',
+const SURUM = 'olcer-v2';
+const DOSYALAR = ['./', 'index.html', 'css/stil.css', 'js/app.js', 'js/birimler.js', 'js/fizik.js', 'js/hesaplar.js', 'js/araclar.js', 'js/ortak.js', 'js/hizolcer.js', 'js/canli.js',
   'manifest.webmanifest', 'ikon/ikon.svg', 'ikon/ikon-192.png', 'ikon/ikon-512.png'];
 
 self.addEventListener('install', e => {

@@ -1,0 +1,63 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Bağımlılıklar
+        run: npm ci
+
+      - name: Testler
+        run: npm test
+
+      - name: Web dosyalarını Android projesine aktar
+        run: npm run android
+
+      - name: APK derle
+        working-directory: android
+        env:
+          SURUM_KODU: ${{ github.run_number }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: APK'yı adlandır
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk olcer.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: olcer-apk
+          path: olcer.apk
+
+      - name: Sürüm olarak yayınla
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v1.0.${{ github.run_number }}" olcer.apk \
+            --title "Ölçer 1.0.${{ github.run_number }}" \
+            --notes "Android için Ölçer. Telefonunuzda **olcer.apk** dosyasına dokunup indirin ve kurun (bilinmeyen kaynaklardan kuruluma izin vermeniz gerekebilir)." \
+            --latest

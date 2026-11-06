@@ -1,0 +1,8 @@
+{
+  "appId": "io.github.burhanettiny.olcer",
+  "appName": "Ölçer",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#0f766e"
+  }
+}
