@@ -4,7 +4,7 @@
 
 import { bicimle, sayiOku } from './birimler.js';
 import { G0, barometrikYukseklik, ciyNoktasi, haversine } from './fizik.js';
-import { el, ayarOku, ayarYaz } from './ortak.js';
+import { el, ayarOku, ayarYaz, kayitDugmesi } from './ortak.js';
 
 const yerel = () => window.Capacitor?.Plugins?.OlcerSensor;
 const GECMIS = 150;
@@ -27,6 +27,7 @@ function kart(ikon, ad, birim) {
   let degisti = false;
   return {
     kok, ekler: null,
+    ozet() { return kok.hidden || kok.classList.contains('bos') || kok.classList.contains('yok') ? null : [ad, `${deger.textContent} ${birimEl.textContent}`]; },
     yaz(metin, satirlar = []) {
       kok.classList.remove('bos', 'yok');
       durum.textContent = '';
@@ -360,6 +361,7 @@ export const CANLI = {
       el('p', { sinif: 'kucuk' }, 'Görmek istediğiniz ölçümleri seçin. Bir karta dokunursanız tam ekran büyür.'),
       cipler,
       el('div', { sinif: 'dugmeler' }, basla, durdurDugme, sesDugme,
+        kayitDugmesi(() => Object.values(k).map(x => x.ozet()).filter(Boolean), 'Canlı ölçüm anlık görüntüsü'),
         el('button', { type: 'button', onclick: () => { yol = 0; gpsMaks = 0; gMaks = 0; tepeIvme = 0; isikMaks = 0; basincRef = Number.isFinite(sonBasinc) ? sonBasinc : null; adimIlk = null; } }, '↺ Sıfırla')),
       bilgi,
       izgara,

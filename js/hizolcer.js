@@ -2,7 +2,7 @@
 
 import { bicimle, sayiOku, sureBicimle } from './birimler.js';
 import { haversine, kerteriz, G0 } from './fizik.js';
-import { el, ayarOku, ayarYaz } from './ortak.js';
+import { el, ayarOku, ayarYaz, kayitDugmesi } from './ortak.js';
 
 const BIRIMLER = [['km/sa', 3.6], ['m/s', 1], ['mph', 1 / 0.44704], ['kn', 3600 / 1852]];
 const DURMA_ESIGI = 0.5;   // m/s — bunun altı GPS gürültüsü kabul edilip 0 gösterilir
@@ -201,6 +201,7 @@ export const HIZ_OLCER = {
         el('button', { type: 'button', onclick: () => { maks = 0; mesafe = 0; hareketSure = 0; gMaks = 0; baslangic = izleyici != null ? Date.now() : null; ciz(); } }, '↺ Sıfırla'),
         el('button', { type: 'button', onclick: () => { yaris = { durum: yaris.durum === 'kapali' || yaris.durum === 'bitti' ? 'hazir' : 'kapali', t0: 0, sonuc: null }; baslat(); ciz(); } }, '⏱ 0–100 ölçümü'),
         el('button', { type: 'button', onclick: () => ekran.classList.toggle('hud') }, '🪞 HUD (cama yansıt)'),
+        kayitDugmesi(() => baslangic ? [['En yüksek hız', dMaks.textContent], ['Ortalama hız', dOrt.textContent], ['Yol', dYol.textContent], ['Süre', dSure.textContent], ...(yaris.durum === 'bitti' ? [['Hızlanma', yarisD.textContent]] : [])] : [], 'Yolculuk (hız göstergesi)'),
         el('button', { type: 'button', onclick: () => { const d = document.documentElement; if (document.fullscreenElement) document.exitFullscreen(); else d.requestFullscreen?.().catch(() => {}); } }, '⛶ Tam ekran'),
       ),
       el('label', { sinif: 'girdi' }, limitAd, limitGir),

@@ -118,3 +118,34 @@ test('ohm', () => {
   const r = hesap('ohm')({ V: 230, I: NaN, R: NaN, P: 2300 });
   yakin(r[1].d, 10); yakin(r[2].d, 23);
 });
+
+test('perde tespiti (akort)', async () => {
+  const { perdeBul, notaBilgisi } = await import('../js/frekans.js');
+  for (const f of [41.2, 82.41, 110, 196.0, 440, 1760]) {
+    const sr = 48000, buf = new Float32Array(3600);
+    for (let i = 0; i < buf.length; i++) buf[i] = 0.3 * Math.sin(2 * Math.PI * f * i / sr) + 0.15 * Math.sin(4 * Math.PI * f * i / sr);
+    yakin(perdeBul(buf, sr), f, 5e-4);
+  }
+  const la = notaBilgisi(440);
+  assert.equal(la.ad, 'La'); assert.equal(la.oktav, 4); yakin(la.sent, 0, 1e-9);
+  assert.equal(notaBilgisi(261.63).uluslararasi, 'C');
+  assert.equal(perdeBul(new Float32Array(3600), 48000), null);
+});
+
+test('ekspertiz sınıflandırma', async () => {
+  const { siniflandir } = await import('../js/ekspertiz.js');
+  assert.equal(siniflandir([110, 120]).sinif, 'orijinal');
+  assert.equal(siniflandir([120, 210]).sinif, 'boyali');
+  assert.equal(siniflandir([450]).sinif, 'macun');
+  assert.equal(siniflandir([50]).sinif, 'ince');
+  assert.equal(siniflandir([]), null);
+});
+
+test('renk dönüşümleri', async () => {
+  const { rgbLab, enYakinRenk } = await import('../js/kamera.js');
+  const [L, a, b] = rgbLab(255, 255, 255);
+  yakin(L, 100, 1e-3); assert.ok(Math.abs(a) < 0.01 && Math.abs(b) < 0.01);
+  const kirmizi = rgbLab(255, 0, 0);
+  yakin(kirmizi[0], 53.24, 1e-3); yakin(kirmizi[1], 80.09, 1e-3);
+  assert.equal(enYakinRenk(20, 30, 95).ad, 'Lacivert');
+});

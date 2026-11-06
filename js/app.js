@@ -4,6 +4,7 @@ import { BOYUTLAR, siye, sidan, sayiOku, sureOku, bicimle, sadeBicim } from './b
 import { HESAPLAR, KATEGORILER, MALZEMELER } from './hesaplar.js';
 import { koordinatOku } from './fizik.js';
 import { ARACLAR, ayarOku, ayarYaz } from './araclar.js';
+import { kayitlar, kayitSil, kayitDugmesi, paylas } from './ortak.js';
 
 const ana = document.getElementById('ana');
 const ekle = (...dugumler) => ana.append(...dugumler.filter(Boolean));
@@ -186,7 +187,15 @@ function hesapSayfasi(id) {
     return { v, hamlar };
   }
 
+  let sonSonuc = [];
+  function girdiOzeti() {
+    return Object.values(alanlar).filter(({ satir, kontrol }) => !satir.hidden && kontrol.value.trim()).map(({ g, kontrol }) => {
+      const deger = g.tip === 'secim' ? kontrol.selectedOptions[0]?.textContent : kontrol.value.trim().replace(/\n+/g, '; ');
+      return [g.ad, g.boyut && !(g.sure && kontrol.value.includes(':')) ? `${deger} ${kayit.birim[g.id] || g.birim}` : deger];
+    });
+  }
   function hesapla() {
+    sonSonuc = [];
     const { v, hamlar } = degerler();
     kayit.girdi = hamlar;
     ayarYaz(`hesap.${id}`, kayit);
@@ -209,6 +218,7 @@ function hesapSayfasi(id) {
     let sonuc;
     try { sonuc = h.hesapla(v); }
     catch (e) { ciktilar.append(el('p', { sinif: 'hata' }, e.message)); return; }
+    sonSonuc = sonuc.map(c => [c.ad, c.metin !== undefined ? c.metin : `${bicimle(sidan(c.d, c.boyut, kayit.cikti[`${sonuc.indexOf(c)}:${c.ad}`] || c.birim), basamak())} ${kayit.cikti[`${sonuc.indexOf(c)}:${c.ad}`] || c.birim}`]);
     sonuc.forEach((c, i) => {
       const anahtar = `${i}:${c.ad}`;
       const satir = el('div', { sinif: 'cikti' + (c.vurgu ? ' vurgu' : '') }, el('span', { sinif: 'cikti-ad' }, c.ad));
@@ -247,7 +257,10 @@ function hesapSayfasi(id) {
     el('h2', { sinif: 'sonuc-baslik' }, 'Sonuç'),
     ciktilar,
     h.not ? el('p', { sinif: 'not' }, h.not) : null,
-    el('div', { sinif: 'dugmeler' }, el('button', { type: 'button', onclick: () => { ayarYaz(`hesap.${id}`, {}); yonlendir(); } }, 'Varsayılanlara dön')),
+    el('div', { sinif: 'dugmeler' },
+      kayitDugmesi(() => sonSonuc.length ? [...girdiOzeti(), ['—', '—'], ...sonSonuc] : [], h.ad),
+      el('button', { type: 'button', onclick: () => paylas(h.ad, [h.ad, ...girdiOzeti().map(([a, b]) => `${a}: ${b}`), '', ...sonSonuc.map(([a, b]) => `${a}: ${b}`)].join('\n')) }, '📤 Paylaş'),
+      el('button', { type: 'button', onclick: () => { ayarYaz(`hesap.${id}`, {}); yonlendir(); } }, 'Varsayılanlara dön')),
   );
   hesapla();
 }
@@ -261,6 +274,42 @@ function aracSayfasi(id) {
   ekle(el('nav', { sinif: 'geri' }, el('a', { href: '#/' }, '← Ana sayfa')), el('h1', {}, `${a.ikon} ${a.ad}`), el('p', {}, a.aciklama), kok);
   if (!window.isSecureContext) kok.append(el('p', { sinif: 'hata' }, 'Sensörler yalnızca güvenli (https) bağlantıda çalışır.'));
   temizle = a.ac(kok);
+}
+
+// ================================================================ KAYIT DEFTERİ
+function kayitlarSayfasi() {
+  document.title = 'Kayıt defteri — Ölçer';
+  const liste = el('div', { sinif: 'kayit-liste' });
+  const metin = k => [`${k.baslik} — ${new Date(k.zaman).toLocaleString('tr-TR')}`, ...(k.not ? [`Not: ${k.not}`] : []), ...k.satirlar.filter(([a]) => a !== '—').map(([a, b]) => `${a}: ${b}`)].join('\n');
+  const ciz = () => {
+    liste.textContent = '';
+    const tum = kayitlar();
+    if (!tum.length) { liste.append(el('p', { sinif: 'bekliyor' }, 'Henüz kayıt yok. Hesaplayıcılarda ve ölçüm araçlarında "💾 Kaydet"e basarak sonuçları buraya ekleyebilirsiniz.')); return; }
+    for (const k of tum) {
+      liste.append(el('article', { sinif: 'kayit' },
+        el('header', {}, el('strong', {}, k.baslik), el('time', {}, new Date(k.zaman).toLocaleString('tr-TR'))),
+        k.not ? el('p', { sinif: 'kayit-not' }, k.not) : null,
+        el('dl', {}, k.satirlar.map(([a, b]) => a === '—' ? el('hr') : el('div', {}, el('dt', {}, a), el('dd', {}, b)))),
+        el('div', { sinif: 'dugmeler' },
+          el('button', { type: 'button', onclick: () => paylas(k.baslik, metin(k)) }, '📤 Paylaş'),
+          el('button', { type: 'button', onclick: () => { if (confirm('Bu kayıt silinsin mi?')) { kayitSil(k.id); ciz(); } } }, '🗑 Sil'))));
+    }
+  };
+  const csv = () => {
+    const kac = s => `"${String(s).replace(/"/g, '""')}"`;
+    const satirlar = [['Tarih', 'Başlık', 'Not', 'Büyüklük', 'Değer'].map(kac).join(';')];
+    for (const k of kayitlar()) for (const [a, b] of k.satirlar) if (a !== '—') satirlar.push([new Date(k.zaman).toLocaleString('tr-TR'), k.baslik, k.not || '', a, b].map(kac).join(';'));
+    return satirlar.join('\n');
+  };
+  ekle(
+    el('nav', { sinif: 'geri' }, el('a', { href: '#/' }, '← Ana sayfa')),
+    el('h1', {}, '📋 Kayıt defteri'),
+    el('div', { sinif: 'dugmeler' },
+      el('button', { type: 'button', onclick: () => paylas('Ölçer kayıtları', kayitlar().map(metin).join('\n\n')) }, '📤 Tümünü paylaş'),
+      el('button', { type: 'button', onclick: () => paylas('Ölçer kayıtları (CSV)', csv()) }, '📊 CSV olarak paylaş')),
+    liste,
+  );
+  ciz();
 }
 
 // ================================================================ AYARLAR
@@ -298,6 +347,7 @@ function yonlendir() {
   else if (tur === 'hesap') hesapSayfasi(id);
   else if (tur === 'arac') aracSayfasi(id);
   else if (tur === 'ayarlar') ayarlarSayfasi();
+  else if (tur === 'kayitlar') kayitlarSayfasi();
   else anaSayfa();
   scrollTo(0, 0);
 }

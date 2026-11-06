@@ -8,6 +8,9 @@ const KART_MM = 85.6; // ISO/IEC 7810 ID-1 (kredi kartı) genişliği
 import { el, ayarOku, ayarYaz } from './ortak.js';
 import { HIZ_OLCER } from './hizolcer.js';
 import { CANLI } from './canli.js';
+import { MESAFE_YUKSEKLIK, NABIZ, RENK } from './kamera.js';
+import { FREKANS } from './frekans.js';
+import { EKSPERTIZ } from './ekspertiz.js';
 
 export { ayarOku, ayarYaz };
 
@@ -15,17 +18,21 @@ const satir = (ad, degerEl) => el('div', { sinif: 'cikti' }, el('span', { sinif:
 const deger = () => el('span', { sinif: 'cikti-deger' }, '—');
 const uyari = metin => el('p', { sinif: 'uyari' }, metin);
 
+/** iOS ve yeni tarayıcılarda hareket sensörü izni ister; reddedilse de dinlemeye devam edilir. */
 async function yonIzni() {
-  const D = window.DeviceOrientationEvent;
-  if (D && typeof D.requestPermission === 'function') {
-    const sonuc = await D.requestPermission();
-    if (sonuc !== 'granted') throw new Error('Hareket sensörü izni verilmedi.');
+  for (const S of [window.DeviceOrientationEvent, window.DeviceMotionEvent]) {
+    try { if (S && typeof S.requestPermission === 'function') await S.requestPermission(); } catch { /* yok */ }
   }
 }
 
 export const ARACLAR = [
   CANLI,
   HIZ_OLCER,
+  MESAFE_YUKSEKLIK,
+  NABIZ,
+  FREKANS,
+  RENK,
+  EKSPERTIZ,
 
   // ------------------------------------------------------------ CETVEL
   {
