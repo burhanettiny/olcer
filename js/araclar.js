@@ -13,6 +13,7 @@ import { FREKANS } from './frekans.js';
 import { EKSPERTIZ } from './ekspertiz.js';
 import { KIBLE } from './kible.js';
 import { TERAZI } from './terazi.js';
+import { manyetikSapma } from './wmm.js';
 
 export { ayarOku, ayarYaz };
 
@@ -148,13 +149,21 @@ export const ARACLAR = [
       const baslat = async () => {
         try { await yonIzni(); addEventListener(olay, dinle); bilgi.textContent = 'Telefonu yere paralel tutun; gerekirse 8 çizerek sensörü kalibre edin.'; }
         catch (e) { bilgi.textContent = e.message; }
+        // Manyetik sapmayı konuma göre WMM2025 modelinden otomatik hesapla
+        navigator.geolocation?.getCurrentPosition(p => {
+          sapma = manyetikSapma(p.coords.latitude, p.coords.longitude, (p.coords.altitude || 0) / 1000);
+          sapmaGir.value = sapma.toFixed(2).replace('.', ',');
+          ayarYaz('manyetikSapma', sapma);
+          sapmaKaynak.textContent = `Konumunuza göre WMM2025 modelinden hesaplandı (${p.coords.latitude.toFixed(2)}, ${p.coords.longitude.toFixed(2)}).`;
+        }, () => { sapmaKaynak.textContent = 'Konum alınamadı; sapmayı elle girin.'; }, { maximumAge: 600000, timeout: 20000 });
       };
+      const sapmaKaynak = el('small', { sinif: 'ipucu' }, 'Başlatınca konumunuza göre otomatik hesaplanır.');
       kok.append(
         kadran, satir('Manyetik yön', manyetik), satir('Gerçek (coğrafi) yön', gercek),
-        el('label', { sinif: 'girdi' }, el('span', {}, 'Manyetik sapma (doğu +, derece)'), sapmaGir),
+        el('label', { sinif: 'girdi' }, el('span', {}, 'Manyetik sapma (doğu +, derece)'), sapmaGir, sapmaKaynak),
         bilgi,
         el('div', { sinif: 'dugmeler' }, el('button', { sinif: 'birincil', onclick: baslat }, 'Başlat')),
-        uyari('Manyetik sapma konuma ve yıla göre değişir (Türkiye\'de 2026 için yaklaşık +5° ile +7° doğu). Kesin değeri NOAA/BGS manyetik model hesaplayıcılarından alın. Metal ve mıknatıslar okumayı bozar.'),
+        uyari('Manyetik sapma konuma ve yıla göre değişir (Türkiye\'de 2026 için yaklaşık +5° ile +7° doğu); NOAA/BGS Dünya Manyetik Modeli (WMM2025) ile otomatik hesaplanır. Metal ve mıknatıslar okumayı bozar.'),
       );
       return () => removeEventListener(olay, dinle);
     },

@@ -26,12 +26,22 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        // Google Play yükleme anahtarı: GitHub Actions gizli değişkenlerinden gelir, depoda bulunmaz.
+        if (System.getenv("OLCER_ANAHTAR")) {
+            release {
+                storeFile file(System.getenv("OLCER_ANAHTAR"))
+                storePassword System.getenv("OLCER_ANAHTAR_SIFRE")
+                keyAlias System.getenv("OLCER_ANAHTAR_ADI") ?: "olcer"
+                keyPassword System.getenv("OLCER_ANAHTAR_SIFRE")
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
+            if (System.getenv("OLCER_ANAHTAR")) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -48,16 +48,47 @@ jobs:
       - name: APK'yı adlandır
         run: cp android/app/build/outputs/apk/debug/app-debug.apk olcer.apk
 
+      # Google Play paketi (AAB). Yayın derlemesi her seferinde denenir; yükleme anahtarı gizli
+      # değişkenlerde tanımlıysa imzalanıp Sürümler sayfasına eklenir (magaza/README.md).
+      - name: Play Store paketi (AAB) derle
+        id: aab
+        working-directory: android
+        env:
+          SURUM_KODU: ${{ github.run_number }}
+          ANAHTAR_DOSYASI: ${{ secrets.ANAHTAR_DOSYASI }}
+          OLCER_ANAHTAR_SIFRE: ${{ secrets.ANAHTAR_SIFRE }}
+        run: |
+          if [ -n "$ANAHTAR_DOSYASI" ]; then
+            echo "$ANAHTAR_DOSYASI" | base64 -d > "$RUNNER_TEMP/olcer-yukleme.p12"
+            export OLCER_ANAHTAR="$RUNNER_TEMP/olcer-yukleme.p12"
+          fi
+          ./gradlew bundleRelease --no-daemon
+          rm -f "$RUNNER_TEMP/olcer-yukleme.p12"
+          if [ -n "$ANAHTAR_DOSYASI" ]; then
+            cp app/build/outputs/bundle/release/app-release.aab ../olcer.aab
+            echo "var=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Yükleme anahtarı tanımlı değil: AAB imzasız derlendi ve yayınlanmadı. magaza/README.md'ye bakın."
+          fi
+
       - uses: actions/upload-artifact@v4
         with:
           name: olcer-apk
           path: olcer.apk
 
+      - uses: actions/upload-artifact@v4
+        if: steps.aab.outputs.var == '1'
+        with:
+          name: olcer-aab
+          path: olcer.aab
+
       - name: Sürüm olarak yayınla
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "v1.0.${{ github.run_number }}" olcer.apk \
+          DOSYALAR="olcer.apk"
+          [ -f olcer.aab ] && DOSYALAR="$DOSYALAR olcer.aab"
+          gh release create "v1.0.${{ github.run_number }}" $DOSYALAR \
             --title "Ölçer 1.0.${{ github.run_number }}" \
-            --notes "Android için Ölçer. Telefonunuzda **olcer.apk** dosyasına dokunup indirin ve kurun (bilinmeyen kaynaklardan kuruluma izin vermeniz gerekebilir)." \
+            --notes "Android için Ölçer. Telefonunuzda **olcer.apk** dosyasına dokunup indirin ve kurun (bilinmeyen kaynaklardan kuruluma izin vermeniz gerekebilir). **olcer.aab** varsa Google Play Console'a yüklenecek pakettir." \
             --latest

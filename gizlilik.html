@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ölçer — Gizlilik Politikası</title>
+<meta name="description" content="Ölçer uygulamasının gizlilik politikası: hiçbir kişisel veri toplanmaz, gönderilmez veya paylaşılmaz.">
+<style>
+  :root { --zemin: #f6f7f7; --yazi: #14201e; --soluk: #5b6b68; --vurgu: #0f766e; --cizgi: #d7dedc; color-scheme: light dark; }
+  @media (prefers-color-scheme: dark) { :root { --zemin: #0e1413; --yazi: #e6efed; --soluk: #9db0ac; --vurgu: #2dd4bf; --cizgi: #2b3a38; } }
+  body { margin: 0; background: var(--zemin); color: var(--yazi); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 1.5rem 16px 3rem; }
+  h1 { font-size: 1.6rem; margin-bottom: .25rem; }
+  h2 { font-size: 1.15rem; margin-top: 2rem; }
+  a { color: var(--vurgu); }
+  table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+  th, td { text-align: left; padding: .5rem; border-bottom: 1px solid var(--cizgi); vertical-align: top; }
+  .tarih { color: var(--soluk); }
+  .ozet { border-left: 4px solid var(--vurgu); padding: .5rem 1rem; background: color-mix(in srgb, var(--vurgu) 10%, transparent); border-radius: 0 8px 8px 0; }
+</style>
+</head>
+<body>
+<main>
+<h1>Ölçer — Gizlilik Politikası</h1>
+<p class="tarih">Yürürlük tarihi: 6 Kasım 2026</p>
+
+<p class="ozet"><strong>Kısaca:</strong> Ölçer hiçbir kişisel veri toplamaz, sunucuya göndermez, satmaz veya üçüncü kişilerle paylaşmaz. Tüm ölçümler ve hesaplamalar yalnızca telefonunuzda yapılır. Uygulamada reklam, analiz (istatistik) aracı ve kullanıcı hesabı yoktur.</p>
+
+<h2>1. Uygulamayı geliştiren</h2>
+<p>Ölçer, GitHub kullanıcısı <a href="https://github.com/burhanettiny">burhanettiny</a> tarafından geliştirilen, açık kaynak kodlu bir ölçüm uygulamasıdır. Kaynak kodu: <a href="https://github.com/burhanettiny/olcer">github.com/burhanettiny/olcer</a>.</p>
+
+<h2>2. Kullanılan izinler ve neden gerektiği</h2>
+<p>İzinler yalnızca ilgili ölçüm aracını açıp başlattığınızda istenir. Bir izni vermezseniz yalnızca o araç çalışmaz; uygulamanın geri kalanı çalışmaya devam eder.</p>
+<table>
+  <tr><th>İzin</th><th>Ne için kullanılır</th></tr>
+  <tr><td>Konum (hassas ve yaklaşık)</td><td>Hız göstergesi, GPS ile yol ve arazi ölçümü, kıble yönü, bulunduğunuz yerdeki manyetik sapma ve yerçekimi hesabı. Konum yalnızca uygulama ekranı açıkken okunur; arka planda konum alınmaz.</td></tr>
+  <tr><td>Kamera</td><td>Mesafe/yükseklik ölçer, nabız ölçer (parmak ucu), renk ölçer ve terazinin kamera çizgisi. Görüntüler kaydedilmez, saklanmaz, gönderilmez; her kare anında işlenip atılır.</td></tr>
+  <tr><td>Mikrofon</td><td>Ses seviyesi (desibel) ve frekans/akort ölçümü. Ses kaydedilmez; yalnızca anlık seviye ve frekans hesaplanır.</td></tr>
+  <tr><td>Fiziksel etkinlik</td><td>Telefonun adım sayacı sensörünü okumak (canlı ölçüm panelindeki adım sayısı).</td></tr>
+  <tr><td>Titreşim, ekranı açık tutma</td><td>Hız sınırı aşımı ve "düz/hizalı" uyarıları; ölçüm sürerken ekranın kapanmaması.</td></tr>
+  <tr><td>İnternet</td><td>Uygulamanın çalışma altyapısı (Capacitor) için tanımlıdır. Ölçer kendi başına hiçbir sunucuya bağlanmaz ve veri göndermez.</td></tr>
+</table>
+<p>Hareket sensörleri (ivmeölçer, jiroskop, manyetometre, basınç, ışık, yakınlık, sıcaklık, nem) ve pil bilgisi de yalnızca ekranda göstermek ve hesaplamak için cihaz içinde okunur.</p>
+
+<h2>3. Cihazınızda saklanan bilgiler</h2>
+<p>Girdiğiniz değerler, ayarlar, kalibrasyonlar ve "Kayıt defteri"ne eklediğiniz sonuçlar yalnızca telefonunuzun uygulama belleğinde tutulur. Bu bilgilere geliştirici dahil hiç kimse erişemez. Uygulamayı kaldırdığınızda veya Ayarlar → "Tüm kayıtlı verileri sil" ile bu bilgiler silinir. Android'in kendi yedekleme özelliği açıksa bu bilgiler Google hesabınızdaki cihaz yedeğine dahil edilebilir; bu, Android'in ve Google'ın gizlilik koşullarına tabidir.</p>
+
+<h2>4. Paylaşım</h2>
+<p>Bir sonucu "Paylaş" düğmesiyle gönderdiğinizde, metin sizin seçtiğiniz uygulamaya (ör. mesajlaşma, e-posta) aktarılır. Bu paylaşımı yalnızca siz başlatırsınız; Ölçer kendiliğinden hiçbir şey paylaşmaz.</p>
+
+<h2>5. Çocuklar</h2>
+<p>Ölçer çocuklara yönelik değildir ve hiç kimseden, çocuklar dahil, kişisel veri toplamaz.</p>
+
+<h2>6. Sağlıkla ilgili özellik</h2>
+<p>Nabız ölçer yalnızca bilgilendirme amaçlıdır; tıbbi cihaz değildir, teşhis veya tedavi için kullanılmamalıdır. Ölçülen nabız değeri hiçbir yere gönderilmez.</p>
+
+<h2>7. Değişiklikler</h2>
+<p>Bu politika değişirse güncel hâli bu sayfada yayımlanır ve yürürlük tarihi güncellenir.</p>
+
+<h2>8. İletişim</h2>
+<p>Sorularınız için <a href="https://github.com/burhanettiny/olcer/issues">GitHub üzerinden</a> bize yazabilir ya da Google Play'deki uygulama sayfasında yer alan geliştirici e-posta adresini kullanabilirsiniz.</p>
+
+<p><a href="./">← Ölçer'e dön</a></p>
+</main>
+</body>
+</html>

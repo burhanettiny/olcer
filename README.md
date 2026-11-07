@@ -12,6 +12,8 @@
 
 APK, `main` dalına yapılan her değişiklikte GitHub Actions ile otomatik derlenir ve [Sürümler](https://github.com/burhanettiny/olcer/releases) sayfasında yayınlanır.
 
+**Google Play:** mağaza metinleri, görseller, form cevapları ve adım adım yükleme rehberi [`magaza/`](magaza/README.md) klasöründe.
+
 iPhone için: uygulama tarayıcıda da çalışır (GitHub Pages açıksa `https://burhanettiny.github.io/olcer/`, Safari → Paylaş → Ana Ekrana Ekle). Ancak iOS; basınç, ışık, manyetik alan gibi sensörleri tarayıcıya açmadığı için bunlar yalnızca Android uygulamasında görünür.
 
 ## Neler var
@@ -23,16 +25,20 @@ iPhone için: uygulama tarayıcıda da çalışır (GitHub Pages açıksa `https
   ortam sıcaklığı/nem (sensörü olan telefonlarda), pil yüzdesi, gerilimi, sıcaklığı ve akımı
 - **Hız göstergesi:** büyük rakamlı anlık hız, en yüksek/ortalama hız, yol, süre, rakım, yön, ivme, G kuvveti,
   hız sınırı uyarısı (titreşim + ses), 0–100 km/sa ölçümü, cama yansıtma (HUD) modu, ekran açık kalır
+- **Kıble pusulası:** Kâbe yönü, WMM2025 ile otomatik manyetik sapma düzeltmesi, metal parazit uyarısı, güneşle kıble saati
+- **Su terazisi:** tablo/raf (telefon dik, "sağ tarafı kaç mm yükseltin" yönergesi), yüzey ve kamera çizgisi modları, iki adımlı kalibrasyon
+- **Mesafe ve yükseklik ölçer:** kamerayla nişan alıp eğimden uzaklık ve yükseklik
+- **Nabız ölçer** (kamera + flaş, PPG), **renk ölçer** (RGB, HEX, Lab, ΔE), **frekans ölçer ve akort cihazı** (Hz, nota, sent, spektrum)
+- **Oto ekspertiz:** boya kalınlığı değerlerini araç şemasında değerlendirme
 - Ekran cetveli: kredi/kimlik kartıyla (ISO/IEC 7810 ID-1, 85,60 mm) kalibre edilir
-- Su terazisi / eğim ölçer: sıfır kalibrasyonlu
-- Pusula: manyetik sapma girilerek gerçek kuzey
+- Pusula: manyetik ve gerçek kuzey (sapma WMM2025 ile otomatik)
 - GPS: konum, rakım, hız, yürüyerek yol ölçümü, köşelerde durarak arazi alanı (m², dönüm)
 - Ses seviyesi: dBFS, referans cihazla kalibre edilince dB
 - Kronometre: tur kaydı
 
-**Birim çevirici (18 boyut, ~190 birim):** uzunluk, alan (dönüm, ar, hektar…), hacim, kütle, zaman, hız, ivme, basınç, kuvvet, tork, enerji, güç, sıcaklık, açı, yoğunluk, debi, frekans, yakıt tüketimi, veri.
+**Birim çevirici (19 büyüklük, 183 birim):** uzunluk, alan (dönüm, ar, hektar…), hacim, kütle, zaman, hız, ivme, basınç, kuvvet, tork, enerji, güç, sıcaklık, açı, yoğunluk, debi, frekans, yakıt tüketimi, veri.
 
-**Hesaplayıcılar (40+)**
+**Hesaplayıcılar (44)**
 
 | Kategori | Hesaplar |
 |---|---|
@@ -106,6 +112,10 @@ npm test
 | `js/araclar.js` | sensör araçları (cetvel, terazi, pusula, GPS, ses, kronometre) |
 | `js/canli.js` | canlı ölçüm paneli |
 | `js/hizolcer.js` | hız göstergesi |
+| `js/kible.js`, `js/wmm.js` | kıble pusulası, Dünya Manyetik Modeli (WMM2025) |
+| `js/terazi.js` | su terazisi |
+| `js/kamera.js`, `js/frekans.js`, `js/ekspertiz.js` | kamera/mikrofon araçları, ekspertiz |
+| `magaza/` | Google Play mağaza dosyaları ve yükleme rehberi |
 | `android/` | Capacitor Android projesi; `OlcerSensorPlugin.java` tarayıcının erişemediği sensörleri okur |
 | `js/app.js` | arayüz ve yönlendirme |
 | `sw.js` | çevrimdışı önbellek (dosyalar değişince `SURUM`'ü artırın) |

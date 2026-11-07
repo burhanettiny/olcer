@@ -1,0 +1,47 @@
+# Google Play yükleme anahtarını oluşturur ve deponun gizli değişkenlerine kaydeder.
+# Bir kez, elle çalıştırılır (Actions → "Play yükleme anahtarı oluştur" → Run workflow).
+# Anahtar ve şifre hiçbir yerde yazdırılmaz; yalnızca gizli değişkenlere yazılır.
+# Gereken: ANAHTAR_TOKEN gizli değişkeni (yalnızca bu depo için, "Secrets: Read and write" izinli
+# ince ayarlı kişisel erişim belirteci). Ayrıntı: magaza/README.md
+name: Play yükleme anahtarı oluştur
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  anahtar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Anahtarı oluştur ve gizli değişkenlere kaydet
+        env:
+          GH_TOKEN: ${{ secrets.ANAHTAR_TOKEN }}
+          DEPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::ANAHTAR_TOKEN gizli değişkeni yok. magaza/README.md'deki adımları izleyin."
+            exit 1
+          fi
+          if gh secret list --repo "$DEPO" | grep -q '^ANAHTAR_DOSYASI'; then
+            echo "::error::Yükleme anahtarı zaten var. Üzerine yazılmadı (Play Console aynı anahtarı bekler)."
+            exit 1
+          fi
+          SIFRE="$(openssl rand -base64 30 | tr -d '/+=\n')"
+          echo "::add-mask::$SIFRE"
+          keytool -genkeypair -keystore "$RUNNER_TEMP/k.p12" -storetype PKCS12 -alias olcer \
+            -keyalg RSA -keysize 4096 -validity 10950 \
+            -storepass "$SIFRE" -keypass "$SIFRE" \
+            -dname "CN=Olcer, O=Olcer, C=TR" >/dev/null 2>&1
+          base64 -w0 "$RUNNER_TEMP/k.p12" | gh secret set ANAHTAR_DOSYASI --repo "$DEPO"
+          printf '%s' "$SIFRE" | gh secret set ANAHTAR_SIFRE --repo "$DEPO"
+          keytool -list -v -keystore "$RUNNER_TEMP/k.p12" -storepass "$SIFRE" | grep -E 'SHA256:' | sed 's/^\s*/Sertifika parmak izi: /'
+          rm -f "$RUNNER_TEMP/k.p12"
+          echo "Yükleme anahtarı oluşturuldu ve gizli değişkenlere kaydedildi. Artık her derleme olcer.aab da üretecek."

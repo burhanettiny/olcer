@@ -328,6 +328,7 @@ function ayarlarSayfasi() {
     } }, 'Tüm kayıtlı verileri sil')),
     el('h2', {}, 'Hakkında'),
     el('p', {}, 'Ölçer; birim çevirme, geometrik ve fiziksel hesaplar ile telefon sensörleriyle ölçüm yapan, internet bağlantısı gerektirmeyen bir uygulamadır. Tüm hesaplar cihazınızda yapılır; hiçbir veri gönderilmez.'),
+    el('p', {}, el('a', { href: 'gizlilik.html' }, 'Gizlilik politikası'), ' · ', el('a', { href: 'https://github.com/burhanettiny/olcer' }, 'Kaynak kodu')),
     el('p', { sinif: 'kucuk' }, 'Birim tanımları SI Broşürü (BIPM, 9. baskı) ve NIST SP 811 değerlerine dayanır. Sonuçlar bilgilendirme amaçlıdır; yasal metrolojik işlemlerde (ticari tartım, tapu, kalibrasyon sertifikası) yetkili kuruluşların ölçümleri esastır.'),
   );
 }
